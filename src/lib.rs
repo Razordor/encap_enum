@@ -1,12 +1,12 @@
 #![no_std]
 
 /*!
-A typesafe encapsulated enum useful for interacting with C bitmasks, abbreviating a group of constants with the same type, and an enumerator instance that can be safely assigned too regardless of whether it is in the enum.
+A type-safe encapsulated enum useful for interacting with C bitmasks, abbreviating a group of constants with the same type, and an enumerator instance that can be safely assigned too regardless of whether it is in the enum.
 
 Internally `encap_enum` uses a tuple struct, therefore to access the value of a variant use tuple accessor syntax `.0`.
 
-Throughout the docs terms such as `enum`, and `variant` are used throughout the doc even though the internal representation can be different,
-and the reason for that is because rust's conanical `enum` is used internally when omitting explicit declarations. In other words it acts like
+Terms such as `enum`, and `variant` are used throughout the doc even though the internal representation can be different,
+and the reason is because rust's canonical `enum` is used internally when omitting explicit declarations. In other words it acts like
 an enum, yet it is composed of many different constructs.
 
 ### Example

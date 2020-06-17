@@ -37,7 +37,7 @@ encap_enum!{
 }
 fn main() {
     println!("ByteAlignClient integer representation: {}", ClassStyle::ByteAlignClient.0);
-    println!("ByteAlignClient debug representation: {?:}", ClassStyle::ByteAlignClient);
+    println!("ByteAlignClient debug representation: {:?}", ClassStyle::ByteAlignClient);
 }
 ```
 #### note
