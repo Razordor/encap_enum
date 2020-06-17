@@ -1,0 +1,13 @@
+﻿[package]
+name = "encap_enum"
+version = "0.1.0"
+authors = ["Jonathan Thomason"]
+edition = "2018"
+keywords = ["bit", "flags", "bitflags", "bitmask", "enum"]
+description = "A non-verbose way to define a group constants and bit flags."
+catagories = ["No standard library"]
+license = "MIT"
+repository = "https://github.com/Razordor/encap_enum"
+[badges]
+gitlab = { repository = "https://github.com/Razordor/encap_enum", branch = "master" }
+[dependencies]
