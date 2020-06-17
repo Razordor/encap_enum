@@ -5,7 +5,7 @@ Encap_Enum provides the `encap_enum!` macro for defining enumerations, bitflags 
 Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
-encap_enum = "0.1.0"
+encap_enum = "0.1.2"
 ```
 and this to your crate root:
 ```rust

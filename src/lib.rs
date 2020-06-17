@@ -244,7 +244,7 @@ macro_rules! encap_enum {
         }
     };
     (
-        $(#[$outer_comment:meta])?
+        $(#[$outer_comment:meta])*
         $outer_vis:vis enum $name:ident {
             $(
                 $val_name:ident =
