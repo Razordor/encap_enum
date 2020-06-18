@@ -129,7 +129,7 @@ encap_enum!{
 /**
 A macro for bit flags and enumerations.
 
-See [crate level docs](https://docs.rs/encap_enum/0.1.3/encap_enum/) for full documentation.
+See [crate level docs](https://docs.rs/encap_enum) for full documentation.
 
 ## Example
 ```rust
@@ -686,6 +686,13 @@ mod tests {
                 Rust,
 		    }  
         }
+
+        let mut count = 0;
+        for t in GreaterEnum::iter() {
+            assert_eq!(&count, t);
+            count += 1;
+        }
+
         let a = TestEnum::Array;
         let mut b = TestEnum::Bar;
         b += a;
@@ -723,7 +730,7 @@ mod tests {
         let mut z = GreaterEnum::Foo;
         z += t;
         z -= t;
-        z *= t;
+        z *= GreaterEnum::Bar;
         z &= t;
         z |= t;
         z /= t;
