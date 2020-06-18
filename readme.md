@@ -20,6 +20,7 @@ extern crate encap_enum;
   - change `enum` visibility for both internal values and the enum itself.
 - supports any number of attributes.
   - This includes doc comments, `#[repr(C)]`, `#[derive()]`, and many others.
+- 
 
 ### Example
 ```rust
@@ -42,3 +43,6 @@ fn main() {
 ```
 #### note
 The internal data structure is a tuple struct, so accessing the data must be through `.0`.
+
+### License
+`encap_enum` is licenced under the [MIT Licence](https://opensource.org/licenses/MIT).

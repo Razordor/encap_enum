@@ -1,16 +1,16 @@
 #![no_std]
 
 /*!
-A type-safe encapsulated enum useful for interacting with C bitmasks, abbreviating a group of constants with the same type, and an enumerator instance that can be safely assigned too regardless of whether it is in the enum.
+A type-safe encapsulated `enum` useful for interacting with C bitmasks, abbreviating a group of constants with the same type, and an enumerator instance that can be safely assigned too regardless of whether it is in the enum.
 
 Internally `encap_enum` uses a tuple struct, therefore to access the value of a variant use tuple accessor syntax `.0`.
 
 Terms such as `enum`, and `variant` are used throughout the doc even though the internal representation can be different,
 and the reason is because rust's canonical `enum` is used internally when omitting explicit declarations. In other words it acts like
-an enum, yet it is composed of many different constructs.
+an `enum`, yet it is composed of many different constructs.
 
 ### Example
-The `encap_enum!` allows for bit flags and other common manipulations of data below:
+The `encap_enum!` allows for bit flags and other common manipulations of data. When the `enum`'s type is omitted such as the example below, the type defaults to `isize`.
 ```rust
 # #[macro_use]
 # extern crate encap_enum;
@@ -41,7 +41,7 @@ encap_enum!{
 }
 ```
 
-The `enum_encap!` macro also supports enumeration like a normal fieldless enum by tapping into rust's own `enum`. The internal enum is under the non-public namespace `__encap_enum`, so it will likely be out of the way for the most part.
+The `enum_encap!` macro also supports enumeration like a normal fieldless enum by tapping into rust's own `enum`.
 ```rust
 #[macro_use]
 extern crate encap_enum;
@@ -57,9 +57,10 @@ fn main() {
     println!("{}", OtherFlags::Alpha.0);
 }
 ```
+The internal enum is under the non-public namespace `__encap_enum`. Unfortunately, a fieldless enum may only be declared once per scope due to namespace clashes.
 
 ## Visibility
-The visibility for both the value and the data itself can be changed:
+The visibility for both the `enum` and variants can be changed:
 
 ```rust
 # #[macro_use]
@@ -75,7 +76,7 @@ encap_enum!{
 ```
 
 ## Attributes
-Can be used pretty much anywhere in the macro except right under the declaration (See Corner Cases section at bottom for more details).
+Attributes can be used pretty much anywhere in the macro except right under the declaration (See Corner Cases section at the bottom for more details).
 
 ## Trait Implementations
 The following traits are derived:
@@ -128,7 +129,7 @@ encap_enum!{
 /**
 A macro for bit flags and enumerations.
 
-See [crate level docs](https://docs.rs/encap_enum/0.1.0/encap_enum/) for full documentation.
+See [crate level docs](https://docs.rs/encap_enum/0.1.3/encap_enum/) for full documentation.
 
 ## Example
 ```rust
@@ -219,12 +220,35 @@ macro_rules! encap_enum {
         impl core::convert::From<$type> for $name {
             fn from(right: $type) -> Self { Self(right) }
         }
+        impl core::ops::AddAssign for $name {            
+            fn add_assign(&mut self, right: Self) { self.0 += right.0 }
+        }
+        impl core::ops::SubAssign for $name {            
+            fn sub_assign(&mut self, right: Self) { self.0 -= right.0 }
+        }
+        impl core::ops::MulAssign for $name {            
+            fn mul_assign(&mut self, right: Self) { self.0 *= right.0 }
+        }
+        impl core::ops::BitAndAssign for $name {            
+            fn bitand_assign(&mut self, right: Self) { self.0 &= right.0 }
+        }
+        impl core::ops::BitOrAssign for $name {            
+            fn bitor_assign(&mut self, right: Self) { self.0 |= right.0 }
+        }
+        impl core::ops::BitXorAssign for $name {            
+            fn bitxor_assign(&mut self, right: Self) { self.0 ^= right.0 }
+        }
+        impl core::ops::DivAssign for $name {            
+            fn div_assign(&mut self, right: Self) { self.0 /= right.0 }
+        }
+        impl core::ops::RemAssign for $name {            
+            fn rem_assign(&mut self, right: Self) { self.0 %= right.0 }
+        }
         impl $name {
             fn iter() -> core::slice::Iter<'static, $type> {
-                const ARRAY: &[$type] = &[$($name :: $val_name .0,)+];
-                ARRAY.into_iter()
-            }
-            //pub const ARRAY: &'static [$type] = &[$($name :: $val_name .0,)+];
+                const _ARRAY: &[$type] = &[$($name :: $val_name .0,)+];
+                _ARRAY.into_iter()
+            }            
             $(
                 $(#[$comment])*
                 #[allow(non_upper_case_globals)]
@@ -312,11 +336,34 @@ macro_rules! encap_enum {
         impl core::convert::From<isize> for $name {
             fn from(right: isize) -> Self { Self(right as isize) }
         }
-
+        impl core::ops::AddAssign for $name {            
+            fn add_assign(&mut self, right: Self) { self.0 += right.0 }
+        }
+        impl core::ops::SubAssign for $name {            
+            fn sub_assign(&mut self, right: Self) { self.0 -= right.0 }
+        }
+        impl core::ops::MulAssign for $name {            
+            fn mul_assign(&mut self, right: Self) { self.0 *= right.0 }
+        }
+        impl core::ops::BitAndAssign for $name {            
+            fn bitand_assign(&mut self, right: Self) { self.0 &= right.0 }
+        }
+        impl core::ops::BitOrAssign for $name {            
+            fn bitor_assign(&mut self, right: Self) { self.0 |= right.0 }
+        }
+        impl core::ops::BitXorAssign for $name {            
+            fn bitxor_assign(&mut self, right: Self) { self.0 ^= right.0 }
+        }
+        impl core::ops::DivAssign for $name {            
+            fn div_assign(&mut self, right: Self) { self.0 /= right.0 }
+        }
+        impl core::ops::RemAssign for $name {            
+            fn rem_assign(&mut self, right: Self) { self.0 %= right.0 }
+        }
         impl $name {
             fn iter() -> core::slice::Iter<'static, isize> {
-                const ARRAY: &[isize] = &[$($name :: $val_name .0,)+];
-                ARRAY.into_iter()
+                const _ARRAY: &[isize] = &[$($name :: $val_name .0,)+];
+                _ARRAY.into_iter()
             }
             
             $(
@@ -393,6 +440,30 @@ macro_rules! encap_enum {
         impl core::convert::From<isize> for $name {
             fn from(right: isize) -> Self { Self(right as isize) }
         }
+        impl core::ops::AddAssign for $name {            
+            fn add_assign(&mut self, right: Self) { self.0 += right.0 }
+        }
+        impl core::ops::SubAssign for $name {            
+            fn sub_assign(&mut self, right: Self) { self.0 -= right.0 }
+        }
+        impl core::ops::MulAssign for $name {            
+            fn mul_assign(&mut self, right: Self) { self.0 *= right.0 }
+        }
+        impl core::ops::BitAndAssign for $name {            
+            fn bitand_assign(&mut self, right: Self) { self.0 &= right.0 }
+        }
+        impl core::ops::BitOrAssign for $name {            
+            fn bitor_assign(&mut self, right: Self) { self.0 |= right.0 }
+        }
+        impl core::ops::BitXorAssign for $name {            
+            fn bitxor_assign(&mut self, right: Self) { self.0 ^= right.0 }
+        }
+        impl core::ops::DivAssign for $name {            
+            fn div_assign(&mut self, right: Self) { self.0 /= right.0 }
+        }
+        impl core::ops::RemAssign for $name {            
+            fn rem_assign(&mut self, right: Self) { self.0 %= right.0 }
+        }
         mod __encap_enum {
             pub enum $name {
                 $($val_name,)+
@@ -401,8 +472,8 @@ macro_rules! encap_enum {
 
         impl $name {
             fn iter() -> core::slice::Iter<'static, isize> {
-                const ARRAY: &[isize] = &[$($name :: $val_name .0,)+];
-                ARRAY.into_iter()
+                const _ARRAY: &[isize] = &[$($name :: $val_name .0,)+];
+                _ARRAY.into_iter()
             }
             $(
                 $(#[$comment])*
@@ -468,7 +539,30 @@ macro_rules! encap_enum {
         impl core::convert::From<$type> for $name {
             fn from(right: $type) -> Self { Self(right as $type) }
         }
-
+        impl core::ops::AddAssign for $name {            
+            fn add_assign(&mut self, right: Self) { self.0 += right.0 }
+        }
+        impl core::ops::SubAssign for $name {            
+            fn sub_assign(&mut self, right: Self) { self.0 -= right.0 }
+        }
+        impl core::ops::MulAssign for $name {            
+            fn mul_assign(&mut self, right: Self) { self.0 *= right.0 }
+        }
+        impl core::ops::BitAndAssign for $name {            
+            fn bitand_assign(&mut self, right: Self) { self.0 &= right.0 }
+        }
+        impl core::ops::BitOrAssign for $name {            
+            fn bitor_assign(&mut self, right: Self) { self.0 |= right.0 }
+        }
+        impl core::ops::BitXorAssign for $name {            
+            fn bitxor_assign(&mut self, right: Self) { self.0 ^= right.0 }
+        }
+        impl core::ops::DivAssign for $name {            
+            fn div_assign(&mut self, right: Self) { self.0 /= right.0 }
+        }
+        impl core::ops::RemAssign for $name {            
+            fn rem_assign(&mut self, right: Self) { self.0 %= right.0 }
+        }
         mod __encap_enum {
             pub enum $name {
                 $($val_name,)+
@@ -477,8 +571,8 @@ macro_rules! encap_enum {
 
         impl $name {
             fn iter() -> core::slice::Iter<'static, $type> {
-                const ARRAY: &[$type] = &[$($name :: $val_name .0,)+];
-                ARRAY.into_iter()
+                const _ARRAY: &[$type] = &[$($name :: $val_name .0,)+];
+                _ARRAY.into_iter()
             }
             
             $(
@@ -498,8 +592,26 @@ mod tests {
             Array,
             Bar,
             Jar,
+            Foo,
         }
     );
+
+    encap_enum!{
+        enum OtherEnum{
+            Foo = 0,
+            Bar = 1,
+            Rust = 2,
+		}  
+    }
+
+    encap_enum!{
+        enum SpecificEnum: pub u32{
+            Foo = 0,
+            Bar = 1,
+            Rust = 2,
+		}  
+    }
+
 
     // Verify the relationship between enum values and raw values.
     #[test]
@@ -521,8 +633,35 @@ mod tests {
     // Verify the enum can iterate
     #[test]
     fn iteration() {
-        let mut count = 0;
+        encap_enum!{
+            enum GreaterEnum: pub u32{
+                Bar,
+                Foo,                
+                Rust,
+		    }  
+        }
+        assert_ne!(GreaterEnum::Bar.0 as isize, TestEnum::Bar.0);
+
+        let mut count = 0isize;
         for t in TestEnum::iter() {
+            assert_eq!(&count, t);
+            count += 1;
+        }
+
+        count = 0;
+        for t in OtherEnum::iter() {
+            assert_eq!(&count, t);
+            count += 1;
+        }
+
+        let mut count = 0u32;
+        for t in SpecificEnum::iter() {
+            assert_eq!(&count, t);
+            count += 1;
+        }
+
+        count = 0;
+        for t in GreaterEnum::iter() {
             assert_eq!(&count, t);
             count += 1;
         }
@@ -536,4 +675,59 @@ mod tests {
             count += 1;
         }
     }
+
+    // verify if the assignment ops have been implemented
+    #[test]
+    fn assignment() {        
+        encap_enum!{
+            enum GreaterEnum: pub u32{
+                Bar,
+                Foo,                
+                Rust,
+		    }  
+        }
+        let a = TestEnum::Array;
+        let mut b = TestEnum::Bar;
+        b += a;
+        b -= a;
+        b *= a;
+        b &= a;
+        b |= a;
+        b /= 54.into();
+        b ^= 6.into();
+        b %= 30.into();
+
+        let t = OtherEnum::Rust;
+        let mut z = OtherEnum::Foo;
+        z += t;
+        z -= t;
+        z *= t;
+        z &= t;
+        z |= t;
+        z /= t;
+        z ^= t;
+        z %= t;
+
+        let t = SpecificEnum::Rust;
+        let mut z = SpecificEnum::Foo;
+        z += t;
+        z -= t;
+        z *= t;
+        z &= t;
+        z |= t;
+        z /= t;
+        z ^= t;
+        z %= t;
+
+        let t = GreaterEnum::Rust;
+        let mut z = GreaterEnum::Foo;
+        z += t;
+        z -= t;
+        z *= t;
+        z &= t;
+        z |= t;
+        z /= t;
+        z ^= t;
+        z %= t;
+	}
 }
