@@ -1,6 +1,13 @@
 Change Log
 ==========
 <details>
+<summary> version 0.1.4 </summary>
+
+* updated links
+* added github badge
+
+</details>
+<details>
 <summary> version 0.1.3 </summary>
 
 * added assignment operators

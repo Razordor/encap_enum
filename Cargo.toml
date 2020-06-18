@@ -1,16 +1,16 @@
 ﻿[package]
 name = "encap_enum"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Jonathan Thomason"]
 edition = "2018"
 keywords = ["bit", "flags", "bitflags", "bitmask", "enum"]
 description = "A non-verbose way to define a group of constants and bit flags."
 categories = ["no-std"]
 license = "MIT"
+license-file = "LICENSE"
 repository = "https://github.com/Razordor/encap_enum"
 readme = "readme.md"
 homepage = "https://github.com/Razordor/encap_enum"
-exclude = [".vs/", "target/", "x64/", "encap_enum.sln", "encap_enum.vcxproj", "encap_enum.vcxproj.filters", "encap_enum.vcxproj.user, sh.exe.stackdump, .git/"]
-[badges]
-travis-ci = { repository = "Razordor/encap_enum", branch = "master" }
+exclude = [".vs/", "target/", "x64/", "encap_enum.sln", "encap_enum.vcxproj", "encap_enum.vcxproj.filters", "encap_enum.vcxproj.user, sh.exe.stackdump, .git/, .github"]
+documentation = "https://docs.rs/encap_enum"
 [dependencies]
