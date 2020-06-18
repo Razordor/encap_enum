@@ -1,6 +1,12 @@
 Change Log
 ==========
 <details>
+<summary> version 0.1.4 </summary>
+
+* added travis-ci badge
+
+</details>
+<details>
 <summary> version 0.1.3 </summary>
 
 * added assignment operators
