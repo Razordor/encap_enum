@@ -139,7 +139,7 @@ Attributes cannot be placed before the first variant and there are no plans to f
 # fn main(){}
 encap_enum!{    
     enum Flag: u32 {
-        /// This doc comment causes errors
+        // A doc comment here would cause errors.
         Gamma = 54,
     }
 }
