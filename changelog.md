@@ -1,6 +1,12 @@
 Change Log
 ==========
 <details>
+<summary> version 0.1.5 </summary>
+
+* added ability for external constants to initialize variants
+
+</details>
+<details>
 <summary> version 0.1.4 </summary>
 
 * updated links

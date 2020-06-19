@@ -9,7 +9,7 @@ Terms such as `enum`, and `variant` are used throughout the doc even though the 
 and the reason is because rust's canonical `enum` is used internally when omitting explicit declarations. In other words it acts like
 an `enum`, yet it is composed of many different constructs.
 
-### Example
+## Example
 The `encap_enum!` allows for bit flags and other common manipulations of data. When the `enum`'s type is omitted such as the example below, the type defaults to `isize`.
 ```rust
 # #[macro_use]
@@ -37,6 +37,22 @@ encap_enum!{
         Omega = 1,
         Sigma = 2,
         Delta = 3,
+    }
+}
+```
+
+Conversely, as of `v0.1.5`, constants outside the enum can be used to initialize variants:
+```rust
+# #[macro_use]
+# extern crate encap_enum;
+# fn main(){ assert_eq!(TakenFlags::Delta.0, 128);}
+const VALUE: u32 = 56;
+const OTHER: u32 = 72;
+encap_enum!{
+    enum TakenFlags: u32 {
+        Omega = ::VALUE, // Omega = 56
+        Sigma = ::OTHER, // Sigma = 72
+        Delta = ::VALUE + ::OTHER, // Delta = 128
     }
 }
 ```
@@ -78,7 +94,8 @@ encap_enum!{
 ## Attributes
 Attributes can be used pretty much anywhere in the macro except right under the declaration (See Corner Cases section at the bottom for more details).
 
-## Trait Implementations
+## Traits
+### Derived Traits
 The following traits are derived:
 - Debug
 - Copy
@@ -102,12 +119,32 @@ The following operators are implemented:
 - Rem
 - Not
 - From
+- AddAssign
+- SubAssign
+- MulAssign
+- BitAndAssign
+- BitOrAssign
+- BitXorAssign
+- DivAssign
+- RemAssign
 
 ## Methods
 - `iter`: An iterator over all the variants.
 
 ## Corner Cases
-Currently attributes cannot be placed before the first variant.
+Attributes cannot be placed before the first variant and there are no plans to fix this.
+```rust
+# #[macro_use]
+# extern crate encap_enum;
+# fn main(){}
+encap_enum!{    
+    enum Flag: u32 {
+        // A doc comment here would cause errors.
+        Gamma = 54,
+    }
+}
+```
+
 
 The `#[repr(C)]` attribute will work and make the enum more ffi compatible, however `#[repr(u8)]`, `#[repr(u16)]`, etc. will not compile because the internal representation that it will apply to is a tuple stuct.
 The equivalent of `#[repr(u32)]`, which would apply on an enum would look like this on an `encap_enum!` declaration:
@@ -166,6 +203,17 @@ macro_rules! encap_enum {
                     $(<< $shl_li:literal   )*  $(<< $shl_id:ident   )*
                     $(>> $shr_li:literal   )*  $(>> $shr_id:ident   )*
                     $(-  $sub_li:literal   )*  $(-  $sub_id:ident   )*
+
+                    $(   :: $sid:ident        )*
+                    $(|  :: $bitor_sid:ident  )*
+                    $(+  :: $add_sid:ident    )*
+                    $(&  :: $bitand_sid:ident )*
+                    $(^  :: $bitxor_sid:ident )*
+                    $(/  :: $div_sid:ident    )*
+                    $(*  :: $mul_sid:ident    )*
+                    $(<< :: $shl_sid:ident    )*
+                    $(>> :: $shr_sid:ident    )*
+                    $(-  :: $sub_sid:ident    )*
                 ,$(#[$comment:meta])*
             )+
         }
@@ -245,6 +293,7 @@ macro_rules! encap_enum {
             fn rem_assign(&mut self, right: Self) { self.0 %= right.0 }
         }
         impl $name {
+            #[allow(dead_code)]
             fn iter() -> core::slice::Iter<'static, $type> {
                 const _ARRAY: &[$type] = &[$($name :: $val_name .0,)+];
                 _ARRAY.into_iter()
@@ -263,6 +312,17 @@ macro_rules! encap_enum {
                     $(<< $shl_li   )*   $(<< $name :: $shl_id    .0)*
                     $(>> $shr_li   )*   $(>> $name :: $shr_id    .0)*
                     $(-  $sub_li   )*   $(-  $name :: $sub_id    .0)*
+
+                    $(   $sid        )*
+                    $(|  $bitor_sid  )*
+                    $(+  $add_sid    )*
+                    $(&  $bitand_sid )*
+                    $(^  $bitxor_sid )*
+                    $(/  $div_sid    )*
+                    $(*  $mul_sid    )*
+                    $(<< $shl_sid    )*
+                    $(>> $shr_sid    )*
+                    $(-  $sub_sid    )*
                 );
             )+
         }
@@ -282,6 +342,17 @@ macro_rules! encap_enum {
                     $(<< $shl_li:literal   )*  $(<< $shl_id:ident   )*
                     $(>> $shr_li:literal   )*  $(>> $shr_id:ident   )*
                     $(-  $sub_li:literal   )*  $(-  $sub_id:ident   )*
+                    
+                    $(   :: $sid:ident        )*
+                    $(|  :: $bitor_sid:ident  )*
+                    $(+  :: $add_sid:ident    )*
+                    $(&  :: $bitand_sid:ident )*
+                    $(^  :: $bitxor_sid:ident )*
+                    $(/  :: $div_sid:ident    )*
+                    $(*  :: $mul_sid:ident    )*
+                    $(<< :: $shl_sid:ident    )*
+                    $(>> :: $shr_sid:ident    )*
+                    $(-  :: $sub_sid:ident    )*
                 ,$(#[$comment:meta])*
             )+
         }
@@ -361,6 +432,7 @@ macro_rules! encap_enum {
             fn rem_assign(&mut self, right: Self) { self.0 %= right.0 }
         }
         impl $name {
+            #[allow(dead_code)]
             fn iter() -> core::slice::Iter<'static, isize> {
                 const _ARRAY: &[isize] = &[$($name :: $val_name .0,)+];
                 _ARRAY.into_iter()
@@ -380,6 +452,17 @@ macro_rules! encap_enum {
                     $(<< $shl_li   )*   $(<< $name :: $shl_id    .0)*
                     $(>> $shr_li   )*   $(>> $name :: $shr_id    .0)*
                     $(-  $sub_li   )*   $(-  $name :: $sub_id    .0)*
+                    
+                    $(   $sid        )*
+                    $(|  $bitor_sid  )*
+                    $(+  $add_sid    )*
+                    $(&  $bitand_sid )*
+                    $(^  $bitxor_sid )*
+                    $(/  $div_sid    )*
+                    $(*  $mul_sid    )*
+                    $(<< $shl_sid    )*
+                    $(>> $shr_sid    )*
+                    $(-  $sub_sid    )*
                 );
             )+
         }
@@ -471,6 +554,7 @@ macro_rules! encap_enum {
         }
 
         impl $name {
+            #[allow(dead_code)]
             fn iter() -> core::slice::Iter<'static, isize> {
                 const _ARRAY: &[isize] = &[$($name :: $val_name .0,)+];
                 _ARRAY.into_iter()
@@ -570,6 +654,7 @@ macro_rules! encap_enum {
         }
 
         impl $name {
+            #[allow(dead_code)]
             fn iter() -> core::slice::Iter<'static, $type> {
                 const _ARRAY: &[$type] = &[$($name :: $val_name .0,)+];
                 _ARRAY.into_iter()
@@ -601,7 +686,7 @@ mod tests {
             Foo = 0,
             Bar = 1,
             Rust = 2,
-		}  
+        }  
     }
 
     encap_enum!{
@@ -609,7 +694,7 @@ mod tests {
             Foo = 0,
             Bar = 1,
             Rust = 2,
-		}  
+        }  
     }
 
 
@@ -638,7 +723,7 @@ mod tests {
                 Bar,
                 Foo,                
                 Rust,
-		    }  
+            }  
         }
         assert_ne!(GreaterEnum::Bar.0 as isize, TestEnum::Bar.0);
 
@@ -684,13 +769,7 @@ mod tests {
                 Bar,
                 Foo,                
                 Rust,
-		    }  
-        }
-
-        let mut count = 0;
-        for t in GreaterEnum::iter() {
-            assert_eq!(&count, t);
-            count += 1;
+            }  
         }
 
         let a = TestEnum::Array;
@@ -736,5 +815,16 @@ mod tests {
         z /= t;
         z ^= t;
         z %= t;
-	}
+    }
+    #[test]
+    fn externvar(){
+        const AQUA: u32 = 34;
+        const TERA: u32 = 64;
+        encap_enum!{
+            enum ExternEnum: u32{
+                Aqua = ::AQUA + ::TERA,
+            }  
+        }
+        assert_eq!(ExternEnum::Aqua.0, AQUA + TERA);
+    }
 }
