@@ -1,6 +1,16 @@
 Change Log
 ==========
 <details>
+<summary> version 0.2.0 </summary>
+
+* fixed prefix negation bug.
+* added `core::ops::Neg`
+* **Breaking Changes**: 
+  * initialization with local constants outside enum has been changed from `::global_const_name` to C cast syntax, which looks like `(enum ClassStyle) global_const_name`.
+  * forced enumerations under a `mod` namespace to get rid of prior limitations.
+
+</details>
+<details>
 <summary> version 0.1.5 </summary>
 
 * added ability for external constants to initialize variants

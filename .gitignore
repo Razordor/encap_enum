@@ -10,3 +10,5 @@ Cargo.lock
 **/*.rs.bk
 /.vs
 *.stackdump
+encap_enum.code-workspace
+.vscode/launch.json
