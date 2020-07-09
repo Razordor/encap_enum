@@ -1,6 +1,6 @@
 ﻿[package]
 name = "encap_enum"
-version = "0.1.5"
+version = "0.2.0"
 authors = ["Jonathan Thomason"]
 edition = "2018"
 keywords = ["bit", "flags", "bitflags", "bitmask", "enum"]
@@ -10,6 +10,5 @@ license = "MIT"
 repository = "https://github.com/Razordor/encap_enum"
 readme = "readme.md"
 homepage = "https://github.com/Razordor/encap_enum"
-exclude = [".vs/", "target/", "x64/", "encap_enum.sln", "encap_enum.vcxproj", "encap_enum.vcxproj.filters", "encap_enum.vcxproj.user, sh.exe.stackdump, .git/, .github"]
+exclude = [".vs/", ".vscode/", "target/", "x64/", "encap_enum.sln", "encap_enum.vcxproj", "encap_enum.vcxproj.filters", "encap_enum.vcxproj.user", "sh.exe.stackdump", ".git/", ".github/", "changelog.md", "encap_enum.code-workspace", ".gitignore"]
 documentation = "https://docs.rs/encap_enum"
-[dependencies]

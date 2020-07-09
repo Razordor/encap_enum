@@ -7,7 +7,7 @@ Encap_Enum provides the `encap_enum!` macro for defining enumerations, bitflags 
 Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
-encap_enum = "0.1.5"
+encap_enum = "0.2.0"
 ```
 and this to your crate root:
 ```rust
@@ -21,7 +21,7 @@ extern crate encap_enum;
 - encapsulated flag values.
   - change `enum` visibility for both internal values and the enum itself.
 - supports any number of attributes.
-  - This includes doc comments, `#[repr(C)]`, `#[derive()]`, and many others.
+  - This includes doc comments, `#[repr(C)]`, `#[derive]`, and many others.
 - No std dependency
 
 ### Example
@@ -43,8 +43,18 @@ fn main() {
     println!("ByteAlignClient debug representation: {:?}", ClassStyle::ByteAlignClient);
 }
 ```
-#### note
-The internal data structure is a tuple struct, so accessing the data must be through `.0`.
+note: The internal data structure is a tuple struct.
 
 ### License
 `encap_enum` is licenced under the [MIT Licence](https://github.com/Razordor/encap_enum/blob/master/LICENSE).
+
+<details closed>
+<summary>Recent Changes (breaking changes from v0.1.5)</summary>
+
+* fixed prefix negation bug.
+* added `core::ops::Neg`
+* **Breaking Changes**: 
+  * initialization with local constants outside enum has been changed from `::global_const_name` to C cast syntax, which looks like `(enum ClassStyle) global_const_name`.
+  * forced enumerations under a `mod` namespace to get rid of prior limitations.
+
+</details>
