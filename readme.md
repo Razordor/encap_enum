@@ -7,7 +7,7 @@ Encap_Enum provides the `encap_enum!` macro for defining enumerations, bitflags 
 Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
-encap_enum = "0.2.0"
+encap_enum = "0.2.1"
 ```
 and this to your crate root:
 ```rust
@@ -49,12 +49,11 @@ note: The internal data structure is a tuple struct.
 `encap_enum` is licenced under the [MIT Licence](https://github.com/Razordor/encap_enum/blob/master/LICENSE).
 
 <details closed>
-<summary>Recent Changes (breaking changes from v0.1.5)</summary>
+<summary>Recent Changes</summary>
 
-* fixed prefix negation bug.
-* added `core::ops::Neg`
-* **Breaking Changes**: 
-  * initialization with local constants outside enum has been changed from `::global_const_name` to C cast syntax, which looks like `(enum ClassStyle) global_const_name`.
-  * forced enumerations under a `mod` namespace to get rid of prior limitations.
+* changed `encap_enum_impl` to `__encap_enum_impl`.
+  * `__encap_enum_impl` is hidden from documentation.
+* fixed visibility bug for methods.
+  * get_bit now has the same visibility as tuple struct data.
 
 </details>

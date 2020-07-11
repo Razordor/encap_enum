@@ -1,6 +1,7 @@
 // Copyright (c) 2020 Jonathan
 
 #![no_std]
+#![allow(dead_code)] // tells rust that I'm not testing everything. there is a lot of duplication, so it would be redundant.
 
 /*!
 A type-safe encapsulated `enum` useful for interacting with C bitmasks, abbreviating a group of constants with the same type, and an enumerator instance that can be safely assigned too regardless of whether it is in the enum.
@@ -137,8 +138,9 @@ The following operators are implemented:
 - RemAssign
 
 ## Methods
-- `iter`: An iterator over all the variants.
-- `get_bit`: query if bit is true.
+- `iter() -> Iter`: An iterator over all the variants.
+- `get_bit(bit:u8)->bool`: query the state of the specified bit. `get_bit`'s visibility depends on the tuple data's visibility.
+
 
 ## Corner Cases
 Attributes cannot be placed before the first variant and there are no plans to fix this.
@@ -170,15 +172,13 @@ encap_enum!{
     }
 }
 ```
-
-The `encap_enum!` macro is currently not capable of dealing with arbitrary expressions like `1+2-4+3`. Expect only repetitions to succeed such as `1+2+3+4`.
-A work-around is to either outsource complex compile-time expressions to external constant variables or to use variants as makeshift parentheses.
 */
 
-/// Provides an implementation to any struct tuple with a single integer field.
-/// Do not rely on this macro as it is merely a part of the implementation of `encap_enum`.
+// Provides an implementation to any struct tuple with a single integer field.
 #[macro_export]
-macro_rules! encap_enum_impl {
+#[doc(hidden)]
+macro_rules! __encap_enum_impl {
+
     ($name:ident, $type:ty) => {
         impl core::ops::BitOr for $name {
             type Output = Self;
@@ -332,16 +332,16 @@ macro_rules! encap_enum {
             $(#[$outer_comment])*
             #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
             $outer_vis struct $name($inner_vis $type);
-            encap_enum_impl!{$name, $type}
+            __encap_enum_impl!{$name, $type}
             impl $name {
-                #[allow(dead_code)]
-                fn iter() -> core::slice::Iter<'static, $type> {
+                pub fn iter() -> core::slice::Iter<'static, $type> {
+
                     const _ARRAY: &[$type] = &[$($name :: $val_name .0,)+];
                     _ARRAY.into_iter()
                 }
 
-                #[allow(dead_code)]
-                fn get_bit(&self, bit:u8) -> bool{
+                $inner_vis fn get_bit(&self, bit:u8) -> bool{
+
                     self.0 & (1 << bit) != 0
                 }
 
@@ -431,17 +431,13 @@ macro_rules! encap_enum {
             $(#[$outer_comment])?
             #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
             $outer_vis struct $name(isize);
-            encap_enum_impl!{$name, isize}
+            __encap_enum_impl!{$name, isize}
             impl $name {
                 #[allow(dead_code)]
-                fn iter() -> core::slice::Iter<'static, isize> {
+                pub fn iter() -> core::slice::Iter<'static, isize> {
+
                     const _ARRAY: &[isize] = &[$($name :: $val_name .0,)+];
                     _ARRAY.into_iter()
-                }
-
-                #[allow(dead_code)]
-                fn get_bit(&self, bit:u8) -> bool{
-                    self.0 & (1 << bit) != 0
                 }
 
                 $(
@@ -512,19 +508,14 @@ macro_rules! encap_enum {
                 $(#[$outer_comment])*
                 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
                 $outer_vis struct $name(isize);
-                encap_enum_impl!{$name, isize}            
+                __encap_enum_impl!{$name, isize}            
                 
-                impl $name {
-                    #[allow(dead_code)]
+                impl $name {                    
                     pub fn iter() -> core::slice::Iter<'static, isize> {
                         const _ARRAY: &[isize] = &[$($name :: $val_name .0,)+];
                         _ARRAY.into_iter()
-                    }
-                    
-                    #[allow(dead_code)]
-                    fn get_bit(&self, bit:u8) -> bool{
-                        self.0 & (1 << bit) != 0
-                    }
+                    }    
+
 
                     $(
                         $(#[$comment])*
@@ -563,17 +554,17 @@ macro_rules! encap_enum {
                 $(#[$outer_comment])*
                 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
                 $outer_vis struct $name($inner_vis $type);
-                encap_enum_impl!{$name, $type}            
+                __encap_enum_impl!{$name, $type}            
                 
                 impl $name {
-                    #[allow(dead_code)]
+
                     pub fn iter() -> core::slice::Iter<'static, $type> {
                         const _ARRAY: &[$type] = &[$($name :: $val_name .0,)+];
                         _ARRAY.into_iter()
                     }
                     
-                    #[allow(dead_code)]
-                    fn get_bit(&self, bit:u8) -> bool{
+                    $inner_vis fn get_bit(&self, bit:u8) -> bool{
+
                         self.0 & (1 << bit) != 0
                     }
 
