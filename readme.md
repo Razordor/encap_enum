@@ -21,7 +21,7 @@ extern crate encap_enum;
 - encapsulated flag values.
   - change `enum` visibility for both internal values and the enum itself.
 - supports any number of attributes.
-  - This includes doc comments, `#[repr(C)]`, `#[derive()]`, and many others.
+  - This includes doc comments, `#[repr(C)]`, `#[derive]`, and many others.
 - No std dependency
 
 ### Example
@@ -43,8 +43,7 @@ fn main() {
     println!("ByteAlignClient debug representation: {:?}", ClassStyle::ByteAlignClient);
 }
 ```
-#### note
-The internal data structure is a tuple struct, so accessing the data must be through `.0`.
+note: The internal data structure is a tuple struct.
 
 ### License
 `encap_enum` is licenced under the [MIT Licence](https://github.com/Razordor/encap_enum/blob/master/LICENSE).
