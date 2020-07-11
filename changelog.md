@@ -1,9 +1,6 @@
 Change Log
 ==========
 <details>
-<<<<<<< Updated upstream
-<summary> version 0.1.5 </summary>
-=======
 <summary> v0.2.1 </summary>
 
 * changed `encap_enum_impl` to `__encap_enum_impl`.
@@ -24,7 +21,6 @@ Change Log
 </details>
 <details>
 <summary> v0.1.5 </summary>
->>>>>>> Stashed changes
 
 * added ability for external constants to initialize variants
 

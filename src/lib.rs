@@ -130,12 +130,8 @@ The following operators are implemented:
 - RemAssign
 
 ## Methods
-<<<<<<< Updated upstream
-- `iter`: An iterator over all the variants.
-=======
 - `iter() -> Iter`: An iterator over all the variants.
 - `get_bit(bit:u8)->bool`: query the state of the specified bit. `get_bit`'s visibility depends on the tuple data's visibility.
->>>>>>> Stashed changes
 
 ## Corner Cases
 Attributes cannot be placed before the first variant and there are no plans to fix this.
@@ -169,72 +165,11 @@ encap_enum!{
 ```
 */
 
-<<<<<<< Updated upstream
-/**
-A macro for bit flags and enumerations.
-
-See [crate level docs](https://docs.rs/encap_enum) for full documentation.
-
-## Example
-```rust
-#[macro_use]
-extern crate encap_enum;
-
-encap_enum!{
-    enum Flags{
-        A = 0x00,
-        B = 0x01,
-        C = 0x02,
-    }
-}
-
-fn main() {
-    println!("A = {}", Flags::A.0);
-}
-```
-*/
-#[macro_export]
-macro_rules! encap_enum {
-    (
-        $(#[$outer_comment:meta])*
-        $outer_vis:vis enum $name:ident : $inner_vis:vis $type:ty {
-            $(
-                $val_name:ident =
-                    $(   $li:literal       )?  $(   $id:ident       )?
-                    $(|  $bitor_li:literal )*  $(|  $bitor_id:ident )*
-                    $(+  $add_li:literal   )*  $(+  $add_id:ident   )*
-                    $(&  $bitand_li:literal)*  $(&  $bitand_id:ident)*
-                    $(^  $bitxor_li:literal)*  $(^  $bitxor_id:ident)*
-                    $(/  $div_li:literal   )*  $(/  $div_id:ident   )*
-                    $(*  $mul_li:literal   )*  $(*  $mul_id:ident   )*
-                    $(<< $shl_li:literal   )*  $(<< $shl_id:ident   )*
-                    $(>> $shr_li:literal   )*  $(>> $shr_id:ident   )*
-                    $(-  $sub_li:literal   )*  $(-  $sub_id:ident   )*
-
-                    $(   :: $sid:ident        )*
-                    $(|  :: $bitor_sid:ident  )*
-                    $(+  :: $add_sid:ident    )*
-                    $(&  :: $bitand_sid:ident )*
-                    $(^  :: $bitxor_sid:ident )*
-                    $(/  :: $div_sid:ident    )*
-                    $(*  :: $mul_sid:ident    )*
-                    $(<< :: $shl_sid:ident    )*
-                    $(>> :: $shr_sid:ident    )*
-                    $(-  :: $sub_sid:ident    )*
-                ,$(#[$comment:meta])*
-            )+
-        }
-    ) => {
-        $(#[$outer_comment])*
-        #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
-        $outer_vis struct $name($inner_vis $type);
-=======
 // Provides an implementation to any struct tuple with a single integer field.
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __encap_enum_impl {
     ($name:ident, $type:ty) => {
->>>>>>> Stashed changes
         impl core::ops::BitOr for $name {
             type Output = Self;
             fn bitor(self, right: Self) -> Self { Self(self.0 | right.0) }
@@ -306,42 +241,6 @@ macro_rules! __encap_enum_impl {
         impl core::ops::RemAssign for $name {            
             fn rem_assign(&mut self, right: Self) { self.0 %= right.0 }
         }
-<<<<<<< Updated upstream
-        impl $name {
-            #[allow(dead_code)]
-            fn iter() -> core::slice::Iter<'static, $type> {
-                const _ARRAY: &[$type] = &[$($name :: $val_name .0,)+];
-                _ARRAY.into_iter()
-            }            
-            $(
-                $(#[$comment])*
-                #[allow(non_upper_case_globals)]
-                pub const $val_name: $name = $name (
-                    $(   $li       )?   $(   $name :: $id        .0)?
-                    $(|  $bitor_li )*   $(|  $name :: $bitor_id  .0)*
-                    $(+  $add_li   )*   $(+  $name :: $add_id    .0)*
-                    $(&  $bitand_li)*   $(&  $name :: $bitand_id .0)*
-                    $(^  $bitxor_li)*   $(^  $name :: $bitxor_id .0)*
-                    $(/  $div_li   )*   $(/  $name :: $div_id    .0)*
-                    $(*  $mul_li   )*   $(*  $name :: $mul_id    .0)*
-                    $(<< $shl_li   )*   $(<< $name :: $shl_id    .0)*
-                    $(>> $shr_li   )*   $(>> $name :: $shr_id    .0)*
-                    $(-  $sub_li   )*   $(-  $name :: $sub_id    .0)*
-
-                    $(   $sid        )*
-                    $(|  $bitor_sid  )*
-                    $(+  $add_sid    )*
-                    $(&  $bitand_sid )*
-                    $(^  $bitxor_sid )*
-                    $(/  $div_sid    )*
-                    $(*  $mul_sid    )*
-                    $(<< $shl_sid    )*
-                    $(>> $shr_sid    )*
-                    $(-  $sub_sid    )*
-                );
-            )+
-        }
-=======
     }
 }
 
@@ -469,7 +368,6 @@ macro_rules! encap_enum {
                 )+
             }
         )+
->>>>>>> Stashed changes
     };
     (
         $(#[$outer_comment:meta])*
@@ -501,87 +399,6 @@ macro_rules! encap_enum {
             )+
         }
     ) => {
-<<<<<<< Updated upstream
-        $(#[$outer_comment])?
-        #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
-        $outer_vis struct $name(isize);
-        impl core::ops::BitOr for $name {
-            type Output = Self;
-            fn bitor(self, right: Self) -> Self { Self(self.0 | right.0) }
-        }
-        impl core::ops::Add for $name {
-            type Output = Self;
-            fn add(self, right: Self) -> Self { Self(self.0 + right.0) }
-        }
-        impl core::ops::BitAnd for $name {
-            type Output = Self;
-            fn bitand(self, right: Self) -> Self { Self(self.0 & right.0) }
-        }
-        impl core::ops::BitXor for $name {
-            type Output = Self;
-            fn bitxor(self, right: Self) -> Self { Self(self.0 ^ right.0) }
-        }
-        impl core::ops::Div for $name {
-            type Output = Self;
-            fn div(self, right: Self) -> Self { Self(self.0 / right.0) }
-        }
-        impl core::ops::Mul for $name {
-            type Output = Self;
-            fn mul(self, right: Self) -> Self { Self(self.0 * right.0) }
-        }
-        impl core::ops::Shl for $name {
-            type Output = Self;
-            fn shl(self, right: Self) -> Self { Self(self.0 << right.0) }
-        }
-        impl core::ops::Shr for $name {
-            type Output = Self;
-            fn shr(self, right: Self) -> Self { Self(self.0 >> right.0) }
-        }
-        impl core::ops::Sub for $name {
-            type Output = Self;
-            fn sub(self, right: Self) -> Self { Self(self.0 - right.0) }
-        }
-        impl core::ops::Rem for $name {
-            type Output = Self;
-            fn rem(self, right: Self) -> Self { Self(self.0 % right.0) }
-        }
-        impl core::ops::Not for $name {
-            type Output = Self;
-            fn not(self) -> Self { Self(!self.0) }
-        }
-        impl core::convert::From<isize> for $name {
-            fn from(right: isize) -> Self { Self(right as isize) }
-        }
-        impl core::ops::AddAssign for $name {            
-            fn add_assign(&mut self, right: Self) { self.0 += right.0 }
-        }
-        impl core::ops::SubAssign for $name {            
-            fn sub_assign(&mut self, right: Self) { self.0 -= right.0 }
-        }
-        impl core::ops::MulAssign for $name {            
-            fn mul_assign(&mut self, right: Self) { self.0 *= right.0 }
-        }
-        impl core::ops::BitAndAssign for $name {            
-            fn bitand_assign(&mut self, right: Self) { self.0 &= right.0 }
-        }
-        impl core::ops::BitOrAssign for $name {            
-            fn bitor_assign(&mut self, right: Self) { self.0 |= right.0 }
-        }
-        impl core::ops::BitXorAssign for $name {            
-            fn bitxor_assign(&mut self, right: Self) { self.0 ^= right.0 }
-        }
-        impl core::ops::DivAssign for $name {            
-            fn div_assign(&mut self, right: Self) { self.0 /= right.0 }
-        }
-        impl core::ops::RemAssign for $name {            
-            fn rem_assign(&mut self, right: Self) { self.0 %= right.0 }
-        }
-        impl $name {
-            #[allow(dead_code)]
-            fn iter() -> core::slice::Iter<'static, isize> {
-                const _ARRAY: &[isize] = &[$($name :: $val_name .0,)+];
-                _ARRAY.into_iter()
-=======
         $(
             $(#[$outer_comment])?
             #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
@@ -631,7 +448,6 @@ macro_rules! encap_enum {
                         $(>> $shr_type_sid ($shr_sid)       .0 )*
                     );
                 )+
->>>>>>> Stashed changes
             }
             
             $(
@@ -756,11 +572,6 @@ macro_rules! encap_enum {
                 _ARRAY.into_iter()
             }
             $(
-<<<<<<< Updated upstream
-                $(#[$comment])*
-                #[allow(non_upper_case_globals)]
-                pub const $val_name: $name = $name ( __encap_enum :: $name :: $val_name as isize);
-=======
                 $(#[$outer_comment])*
                 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
                 $outer_vis struct $name(isize);
@@ -778,7 +589,6 @@ macro_rules! encap_enum {
                         pub const $val_name: $name = $name ( __encap_enum :: $name:: $namespace :: $val_name as isize);
                     )+
                 }
->>>>>>> Stashed changes
             )+
 
         }
@@ -877,11 +687,6 @@ macro_rules! encap_enum {
             }
             
             $(
-<<<<<<< Updated upstream
-                $(#[$comment])*
-                #[allow(non_upper_case_globals)]
-                pub const $val_name: $name = $name ( __encap_enum :: $name :: $val_name as $type);
-=======
                 $(#[$outer_comment])*
                 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
                 $outer_vis struct $name($inner_vis $type);
@@ -903,7 +708,6 @@ macro_rules! encap_enum {
                         pub const $val_name: $name = $name ( __encap_enum :: $name:: $namespace :: $val_name as $type);
                     )+
                 }
->>>>>>> Stashed changes
             )+
 
         }

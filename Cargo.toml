@@ -1,10 +1,6 @@
 ﻿[package]
 name = "encap_enum"
-<<<<<<< Updated upstream
-version = "0.1.5"
-=======
 version = "0.2.1"
->>>>>>> Stashed changes
 authors = ["Jonathan Thomason"]
 edition = "2018"
 keywords = ["bit", "flags", "bitflags", "bitmask", "enum"]

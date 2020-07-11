@@ -7,11 +7,7 @@ Encap_Enum provides the `encap_enum!` macro for defining enumerations, bitflags 
 Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
-<<<<<<< Updated upstream
-encap_enum = "0.1.5"
-=======
 encap_enum = "0.2.1"
->>>>>>> Stashed changes
 ```
 and this to your crate root:
 ```rust
@@ -51,9 +47,6 @@ fn main() {
 The internal data structure is a tuple struct, so accessing the data must be through `.0`.
 
 ### License
-<<<<<<< Updated upstream
-`encap_enum` is licenced under the [MIT Licence](https://github.com/Razordor/encap_enum/blob/master/LICENSE).
-=======
 `encap_enum` is licenced under the [MIT Licence](https://github.com/Razordor/encap_enum/blob/master/LICENSE).
 
 <details closed>
@@ -65,4 +58,3 @@ The internal data structure is a tuple struct, so accessing the data must be thr
   * get_bit now has the same visibility as tuple struct data.
 
 </details>
->>>>>>> Stashed changes
