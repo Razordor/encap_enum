@@ -7,7 +7,7 @@ Encap_Enum provides the `encap_enum!` macro for defining enumerations, bitflags 
 Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
-encap_enum = "0.3.0"
+encap_enum = "0.3.1"
 ```
 and this to your crate root:
 ```rust
@@ -49,10 +49,8 @@ fn main() {
 `encap_enum` is licenced under the [MIT Licence](https://github.com/Razordor/encap_enum/blob/master/LICENSE).
 
 <details closed>
-<summary>Recent Changes (Breaking Changes!)</summary>
+<summary>Recent Changes</summary>
 
-* **Breaking:** changed tuple struct to regular struct for ffi compatibility.
-  * To access data use `raw` variable.
-* added `new` static function. follows inner visibility rules
+* fixed incorrect documentation.
 
 </details>

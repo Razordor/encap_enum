@@ -32,7 +32,7 @@ The flags can be assigned to constants outside the enum since all the enum membe
 ```rust
 # #[macro_use]
 # extern crate encap_enum;
-# fn main(){}
+# fn main(){assert_eq!(MoreFlags::Charlie.raw, -3);}
 const VALUE: isize = MoreFlags::Omega.raw;
 const OTHER: MoreFlags = MoreFlags::Sigma;
 encap_enum!{
@@ -40,6 +40,7 @@ encap_enum!{
         Omega = 1,
         Sigma = 2,
         Delta = 3,
+        Charlie = (-Delta), // Charlie = -3
     }
 }
 ```
@@ -48,14 +49,15 @@ Constants outside the enum can be used to initialize variants:
 ```rust
 # #[macro_use]
 # extern crate encap_enum;
-# fn main(){ assert_eq!(TakenFlags::Delta.raw, 128);}
-const VALUE: u32 = 56;
-const OTHER: u32 = 72;
+# fn main(){ assert_eq!(TakenFlags::Delta.raw, 128); assert_eq!(TakenFlags::Negative, (-56).into())}
+const VALUE: i32 = 56;
+const OTHER: i32 = 72;
 encap_enum!{
-    enum TakenFlags: u32 {
+    enum TakenFlags: i32 {
         Omega = (enum TakenFlags) VALUE, // Omega = 56
         Sigma = (enum TakenFlags) OTHER, // Sigma = 72
         Delta = (enum TakenFlags) VALUE + (enum TakenFlags) OTHER, // Delta = 128
+        Negative = (enum TakenFlags) -VALUE, // Negative = -56
     }
 }
 ```
@@ -153,13 +155,13 @@ Attributes cannot be placed before the first variant and there are no plans to f
 encap_enum!{    
     enum Flag: u32 {
         /// This doc comment causes errors.
-        Gamma = 54,
+        Gamma = -54,
     }
 }
 ```
 
 
-The `#[repr(C)]` attribute will work and make the enum more ffi compatible, however `#[repr(u8)]`, `#[repr(u16)]`, etc. will not compile because the internal representation that it will apply to is a tuple stuct.
+The `#[repr(C)]` attribute will work and make the enum more ffi compatible, however `#[repr(u8)]`, `#[repr(u16)]`, etc. will not compile because the internal representation that it will apply to is a struct.
 The equivalent of `#[repr(u32)]`, which would apply on an enum would look like this on an `encap_enum!` declaration:
 
 ```rust
@@ -448,7 +450,6 @@ macro_rules! encap_enum {
                 }
                 
                 pub fn iter() -> core::slice::Iter<'static, isize> {
-
                     const _ARRAY: &[isize] = &[$($name :: $val_name .raw,)+];
                     _ARRAY.into_iter()
                 }
