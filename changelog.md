@@ -1,12 +1,20 @@
 Change Log
 ==========
 <details>
+<summary> v0.3.0 </summary>
+
+* **Breaking:** changed tuple struct to regular struct for ffi compatibility.
+  * To access data use `raw` variable.
+* added `new` static function. follows inner visibility rules
+
+</details>
+<details>
 <summary> v0.2.1 </summary>
 
 * changed `encap_enum_impl` to `__encap_enum_impl`.
   * `__encap_enum_impl` is hidden from documentation.
 * fixed visibility bug for methods.
-  * get_bit now has the same visibility as tuple struct data.
+  * `get_bit` now has the same visibility as tuple struct data.
 
 </details>
 <details>
