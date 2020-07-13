@@ -1,6 +1,12 @@
 Change Log
 ==========
 <details>
+<summary> v0.3.1 </summary>
+
+* fixed incorrect documentation.
+
+</details>
+<details>
 <summary> v0.3.0 </summary>
 
 * **Breaking:** changed tuple struct to regular struct for ffi compatibility.
