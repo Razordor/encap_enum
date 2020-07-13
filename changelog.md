@@ -3,7 +3,8 @@ Change Log
 <details>
 <summary> v0.3.0 </summary>
 
-* changed tuple struct to regular struct for ffi compatibility.
+* **Breaking:** changed tuple struct to regular struct for ffi compatibility.
+  * To access data use `raw` variable.
 * added `new` static function. follows inner visibility rules
 
 </details>
