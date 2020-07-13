@@ -1,6 +1,6 @@
 ﻿[package]
 name = "encap_enum"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Jonathan Thomason"]
 edition = "2018"
 keywords = ["bit", "flags", "bitflags", "bitmask", "enum"]

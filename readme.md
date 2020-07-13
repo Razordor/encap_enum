@@ -23,6 +23,7 @@ extern crate encap_enum;
 - supports any number of attributes.
   - This includes doc comments, `#[repr(C)]`, `#[derive]`, and many others.
 - No std dependency
+- FFI compatible
 
 ### Example
 ```rust
@@ -39,11 +40,10 @@ encap_enum!{
     }
 }
 fn main() {
-    println!("ByteAlignClient integer representation: {}", ClassStyle::ByteAlignClient.0);
+    println!("ByteAlignClient integer representation: {}", ClassStyle::ByteAlignClient.raw);
     println!("ByteAlignClient debug representation: {:?}", ClassStyle::ByteAlignClient);
 }
 ```
-note: The internal data structure is a tuple struct.
 
 ### License
 `encap_enum` is licenced under the [MIT Licence](https://github.com/Razordor/encap_enum/blob/master/LICENSE).
@@ -51,9 +51,8 @@ note: The internal data structure is a tuple struct.
 <details closed>
 <summary>Recent Changes</summary>
 
-* changed `encap_enum_impl` to `__encap_enum_impl`.
-  * `__encap_enum_impl` is hidden from documentation.
-* fixed visibility bug for methods.
-  * get_bit now has the same visibility as tuple struct data.
+* changed tuple struct to regular struct for ffi compatibility.
+  * To access data use `raw` variable.
+* added `new` static function. follows inner visibility rules
 
 </details>

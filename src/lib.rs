@@ -6,10 +6,10 @@
 /*!
 A type-safe encapsulated `enum` useful for interacting with C bitmasks, abbreviating a group of constants with the same type, and an enumerator instance that can be safely assigned too regardless of whether it is in the enum.
 
-Internally `encap_enum` uses a tuple struct, therefore to access the value of a variant use tuple accessor syntax `.0`.
+Internally `encap_enum` uses a struct, therefore to access the value of a variant use `.raw`.
 
 Terms such as `enum`, and `variant` are used throughout the doc even though the internal representation can be different,
-and the reason is because rust's canonical `enum` is used internally when omitting explicit declarations. In other words it acts like
+and the reason is because rust's canonical `enum` is used internally when omitting explicit declarations of data. In other words it acts like
 an `enum`, yet it is composed of many different constructs.
 
 ## Example
@@ -33,7 +33,7 @@ The flags can be assigned to constants outside the enum since all the enum membe
 # #[macro_use]
 # extern crate encap_enum;
 # fn main(){}
-const VALUE: isize = MoreFlags::Omega.0;
+const VALUE: isize = MoreFlags::Omega.raw;
 const OTHER: MoreFlags = MoreFlags::Sigma;
 encap_enum!{
     enum MoreFlags {
@@ -48,7 +48,7 @@ Constants outside the enum can be used to initialize variants:
 ```rust
 # #[macro_use]
 # extern crate encap_enum;
-# fn main(){ assert_eq!(TakenFlags::Delta.0, 128);}
+# fn main(){ assert_eq!(TakenFlags::Delta.raw, 128);}
 const VALUE: u32 = 56;
 const OTHER: u32 = 72;
 encap_enum!{
@@ -76,7 +76,7 @@ encap_enum!{
     }
 }
 fn main() {
-    println!("{}", flag::OtherFlags::Alpha.0);
+    println!("{}", flag::OtherFlags::Alpha.raw);
 }
 ```
 The internal rust enum, which the struct constants draws values from, is under the namespace you set.
@@ -139,8 +139,10 @@ The following operators are implemented:
 
 ## Methods
 - `iter() -> Iter`: An iterator over all the variants.
-- `get_bit(bit:u8)->bool`: query the state of the specified bit. `get_bit`'s visibility depends on the tuple data's visibility.
-
+- `get_bit(bit:u8)->bool`: query the state of the specified bit. 
+    - Only available if inner visibility is public to the module using it.
+- `new(data: [type])`: initialize with arbitrary data. 
+    - Only available if inner visibility is public to the module using it.
 
 ## Corner Cases
 Attributes cannot be placed before the first variant and there are no plans to fix this.
@@ -182,78 +184,78 @@ macro_rules! __encap_enum_impl {
     ($name:ident, $type:ty) => {
         impl core::ops::BitOr for $name {
             type Output = Self;
-            fn bitor(self, right: Self) -> Self { Self(self.0 | right.0) }
+            fn bitor(self, right: Self) -> Self { Self{raw: self.raw | right.raw} }
         }
         impl core::ops::Add for $name {
             type Output = Self;
-            fn add(self, right: Self) -> Self { Self(self.0 + right.0) }
+            fn add(self, right: Self) -> Self { Self{raw: self.raw + right.raw} }
         }
         impl core::ops::BitAnd for $name {
             type Output = Self;
-            fn bitand(self, right: Self) -> Self { Self(self.0 & right.0) }
+            fn bitand(self, right: Self) -> Self { Self{raw: self.raw & right.raw} }
         }
         impl core::ops::BitXor for $name {
             type Output = Self;
-            fn bitxor(self, right: Self) -> Self { Self(self.0 ^ right.0) }
+            fn bitxor(self, right: Self) -> Self { Self{raw: self.raw ^ right.raw} }
         }
         impl core::ops::Div for $name {
             type Output = Self;
-            fn div(self, right: Self) -> Self { Self(self.0 / right.0) }
+            fn div(self, right: Self) -> Self { Self{raw: self.raw / right.raw} }
         }
         impl core::ops::Mul for $name {
             type Output = Self;
-            fn mul(self, right: Self) -> Self { Self(self.0 * right.0) }
+            fn mul(self, right: Self) -> Self { Self{raw: self.raw * right.raw} }
         }
         impl core::ops::Shl for $name {
             type Output = Self;
-            fn shl(self, right: Self) -> Self { Self(self.0 << right.0) }
+            fn shl(self, right: Self) -> Self { Self{raw: self.raw << right.raw} }
         }
         impl core::ops::Shr for $name {
             type Output = Self;
-            fn shr(self, right: Self) -> Self { Self(self.0 >> right.0) }
+            fn shr(self, right: Self) -> Self { Self{raw: self.raw >> right.raw} }
         }
         impl core::ops::Sub for $name {
             type Output = Self;
-            fn sub(self, right: Self) -> Self { Self(self.0 - right.0) }
+            fn sub(self, right: Self) -> Self { Self{raw: self.raw - right.raw} }
         }
         impl core::ops::Rem for $name {
             type Output = Self;
-            fn rem(self, right: Self) -> Self { Self(self.0 % right.0) }
+            fn rem(self, right: Self) -> Self { Self{raw: self.raw % right.raw} }
         }
         impl core::ops::Not for $name {
             type Output = Self;
-            fn not(self) -> Self { Self(!self.0) }
+            fn not(self) -> Self { Self{raw: !self.raw} }
         }
         impl core::ops::Neg for $name {
             type Output = Self;
-            fn neg(self) -> Self { Self(0 - self.0) }
+            fn neg(self) -> Self { Self{raw: 0 - self.raw} }
         }
         impl core::convert::From<$type> for $name {
-            fn from(right: $type) -> Self { Self(right) }
+            fn from(right: $type) -> Self { Self{raw: right} }
         }
         impl core::ops::AddAssign for $name {            
-            fn add_assign(&mut self, right: Self) { self.0 += right.0 }
+            fn add_assign(&mut self, right: Self) { self.raw += right.raw }
         }
         impl core::ops::SubAssign for $name {            
-            fn sub_assign(&mut self, right: Self) { self.0 -= right.0 }
+            fn sub_assign(&mut self, right: Self) { self.raw -= right.raw }
         }
         impl core::ops::MulAssign for $name {            
-            fn mul_assign(&mut self, right: Self) { self.0 *= right.0 }
+            fn mul_assign(&mut self, right: Self) { self.raw *= right.raw }
         }
         impl core::ops::BitAndAssign for $name {            
-            fn bitand_assign(&mut self, right: Self) { self.0 &= right.0 }
+            fn bitand_assign(&mut self, right: Self) { self.raw &= right.raw }
         }
         impl core::ops::BitOrAssign for $name {            
-            fn bitor_assign(&mut self, right: Self) { self.0 |= right.0 }
+            fn bitor_assign(&mut self, right: Self) { self.raw |= right.raw }
         }
         impl core::ops::BitXorAssign for $name {            
-            fn bitxor_assign(&mut self, right: Self) { self.0 ^= right.0 }
+            fn bitxor_assign(&mut self, right: Self) { self.raw ^= right.raw }
         }
         impl core::ops::DivAssign for $name {            
-            fn div_assign(&mut self, right: Self) { self.0 /= right.0 }
+            fn div_assign(&mut self, right: Self) { self.raw /= right.raw }
         }
         impl core::ops::RemAssign for $name {            
-            fn rem_assign(&mut self, right: Self) { self.0 %= right.0 }
+            fn rem_assign(&mut self, right: Self) { self.raw %= right.raw }
         }
     }
 }
@@ -279,7 +281,7 @@ encap_enum!{
 }
 
 fn main() {
-    println!("A = {}", Flags::A.0);
+    println!("A = {}", Flags::A.raw);
 }
 ```
 */
@@ -291,9 +293,9 @@ macro_rules! encap_enum {
             $outer_vis:vis enum $name:ident : $inner_vis:vis $type:ty {
                 $(
                     $val_name:ident =
-                        $($li:literal $(- $sub_li:literal)* $(- $li_sub_id:ident)* $(- (enum $type0:path) $li_sub_sid:ident )*)?
-                        $($id:ident $(- $sub_id:ident)* $(- $id_sub_li:literal)* $(- (enum $type1:path) $id_sub_sid:ident )*)?                      
-                        $((enum $type2:path) $($sid0:ident)? $(- $sid1:ident)* $(- $($sid_sub_li:literal)* )* )*                
+                        $($li:literal $(- $sub_li:literal)* $(- $li_sub_id:ident)* $(- (enum $type0:ty) $li_sub_sid:ident )*)?
+                        $($id:ident $(- $sub_id:ident)* $(- $id_sub_li:literal)* $(- (enum $type1:ty) $id_sub_sid:ident )*)?                      
+                        $((enum $type2:ty) $($sid0:ident)? $(- $sid1:ident)* $(- $($sid_sub_li:literal)* )* )*                
                         $((-$id1:ident))?
 
                         $(|  $bitor_li:literal)*
@@ -314,14 +316,14 @@ macro_rules! encap_enum {
                         $(<< $shl_id:ident    )*
                         $(>> $shr_id:ident    )*
 
-                        $(|  (enum $bitor_type_sid:path)  $bitor_sid:ident  )*
-                        $(+  (enum $add_type_sid:path)    $add_sid:ident    )*
-                        $(&  (enum $bitand_type_sid:path) $bitand_sid:ident )*
-                        $(^  (enum $bitxor_type_sid:path) $bitxor_sid:ident )*
-                        $(/  (enum $div_type_sid:path)    $div_sid:ident    )*
-                        $(*  (enum $mul_type_sid:path)    $mul_sid:ident    )*
-                        $(<< (enum $shl_type_sid:path)    $shl_sid:ident    )*
-                        $(>> (enum $shr_type_sid:path)    $shr_sid:ident    )*
+                        $(|  (enum $bitor_type_sid:ty)  $bitor_sid:ident  )*
+                        $(+  (enum $add_type_sid:ty)    $add_sid:ident    )*
+                        $(&  (enum $bitand_type_sid:ty) $bitand_sid:ident )*
+                        $(^  (enum $bitxor_type_sid:ty) $bitxor_sid:ident )*
+                        $(/  (enum $div_type_sid:ty)    $div_sid:ident    )*
+                        $(*  (enum $mul_type_sid:ty)    $mul_sid:ident    )*
+                        $(<< (enum $shl_type_sid:ty)    $shl_sid:ident    )*
+                        $(>> (enum $shr_type_sid:ty)    $shr_sid:ident    )*
 
                     ,$(#[$comment:meta])*
                 )+
@@ -331,28 +333,34 @@ macro_rules! encap_enum {
         $(
             $(#[$outer_comment])*
             #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
-            $outer_vis struct $name($inner_vis $type);
+            $outer_vis struct $name{
+                $inner_vis raw: $type            
+            }
             __encap_enum_impl!{$name, $type}
             impl $name {
+                $inner_vis const fn new(data: $type) -> Self{
+                    Self{raw: data}
+                }
+
                 pub fn iter() -> core::slice::Iter<'static, $type> {
 
-                    const _ARRAY: &[$type] = &[$($name :: $val_name .0,)+];
+                    const _ARRAY: &[$type] = &[$($name :: $val_name .raw,)+];
                     _ARRAY.into_iter()
                 }
 
                 $inner_vis fn get_bit(&self, bit:u8) -> bool{
 
-                    self.0 & (1 << bit) != 0
+                    self.raw & (1 << bit) != 0
                 }
 
                 $(
                     $(#[$comment])*
                     #[allow(non_upper_case_globals)]
-                    pub const $val_name: $name = $name (                    
-                        $($li $(- $sub_li)* $(- $name :: $li_sub_id .0)* $(- $type0 ($li_sub_sid) .0 )*)?
-                        $($name :: $id .0 $(- $name :: $sub_id .0)* $(- $id_sub_li)* $(- $type1 ($id_sub_sid) .0 )*)?
-                        $($type2 ($($sid0)? $(- $sid1)*) .0 $(- $($sid_sub_li)* )*)*                    
-                        $(- $name :: $id1 .0)?
+                    pub const $val_name: $name = $name { raw :                    
+                        $($li $(- $sub_li)* $(- $name :: $li_sub_id .raw)* $(- $type0 :: new($li_sub_sid) .raw )*)?
+                        $($name :: $id .raw $(- $name :: $sub_id .raw)* $(- $id_sub_li)* $(- $type1 ::new($id_sub_sid) .raw )*)?
+                        $(<$type2> :: new($($sid0)? $(- $sid1)*) .raw $(- $($sid_sub_li)* )*)*                    
+                        $(- $name :: $id1 .raw)?
 
                         $(|  $bitor_li  )*
                         $(+  $add_li    )*
@@ -363,24 +371,24 @@ macro_rules! encap_enum {
                         $(<< $shl_li    )*
                         $(>> $shr_li    )*
 
-                        $(|  $name :: $bitor_id .0  )*
-                        $(+  $name :: $add_id .0    )*
-                        $(&  $name :: $bitand_id .0 )*
-                        $(^  $name :: $bitxor_id .0 )*
-                        $(/  $name :: $div_id .0    )*
-                        $(*  $name :: $mul_id .0    )*
-                        $(<< $name :: $shl_id .0    )*
-                        $(>> $name :: $shr_id .0    )*
+                        $(|  $name :: $bitor_id .raw  )*
+                        $(+  $name :: $add_id .raw    )*
+                        $(&  $name :: $bitand_id .raw )*
+                        $(^  $name :: $bitxor_id .raw )*
+                        $(/  $name :: $div_id .raw    )*
+                        $(*  $name :: $mul_id .raw    )*
+                        $(<< $name :: $shl_id .raw    )*
+                        $(>> $name :: $shr_id .raw    )*
 
-                        $(|  $bitor_type_sid ($bitor_sid)   .0 )*
-                        $(+  $add_type_sid ($add_sid)       .0 )*
-                        $(&  $bitand_type_sid ($bitand_sid) .0 )*
-                        $(^  $bitxor_type_sid($bitxor_sid)  .0 )*
-                        $(/  $div_type_sid ($div_sid)       .0 )*
-                        $(*  $mul_type_sid ($mul_sid)       .0 )*
-                        $(<< $shl_type_sid ($shl_sid)       .0 )*
-                        $(>> $shr_type_sid ($shr_sid)       .0 )*
-                    );
+                        $(|  <$bitor_type_sid>  :: new($bitor_sid)  .raw )*
+                        $(+  <$add_type_sid>    :: new($add_sid)    .raw )*
+                        $(&  <$bitand_type_sid> :: new($bitand_sid) .raw )*
+                        $(^  <$bitxor_type_sid> :: new($bitxor_sid) .raw )*
+                        $(/  <$div_type_sid>    :: new($div_sid)    .raw )*
+                        $(*  <$mul_type_sid>    :: new($mul_sid)    .raw )*
+                        $(<< <$shl_type_sid>    :: new($shl_sid)    .raw )*
+                        $(>> <$shr_type_sid>    :: new($shr_sid)    .raw )*
+                    };
                 )+
             }
         )+
@@ -391,37 +399,37 @@ macro_rules! encap_enum {
         $outer_vis:vis enum $name:ident {
             $(
                 $val_name:ident =
-                $($li:literal $(- $sub_li:literal)* $(- $li_sub_id:ident)* $(- (enum $type0:path) $li_sub_sid:ident )*)?
-                $($id:ident $(- $sub_id:ident)* $(- $id_sub_li:literal)* $(- (enum $type1:path) $id_sub_sid:ident )*)?                      
-                $((enum $type2:path) $($sid0:ident)? $(- $sid1:ident)* $(- $($sid_sub_li:literal)* )* )*                
-                $((-$id1:ident))?
+                    $($li:literal $(- $sub_li:literal)* $(- $li_sub_id:ident)* $(- (enum $type0:ty) $li_sub_sid:ident )*)?
+                    $($id:ident $(- $sub_id:ident)* $(- $id_sub_li:literal)* $(- (enum $type1:ty) $id_sub_sid:ident )*)?                      
+                    $((enum $type2:ty) $($sid0:ident)? $(- $sid1:ident)* $(- $($sid_sub_li:literal)* )* )*                
+                    $((-$id1:ident))?
                 
-                $(|  $bitor_li:literal)*
-                $(+  $add_li:literal)*
-                $(&  $bitand_li:literal)*
-                $(^  $bitxor_li:literal)*
-                $(/  $div_li:literal)*
-                $(*  $mul_li:literal)*
-                $(<< $shl_li:literal)*
-                $(>> $shr_li:literal)*
+                    $(|  $bitor_li:literal)*
+                    $(+  $add_li:literal)*
+                    $(&  $bitand_li:literal)*
+                    $(^  $bitxor_li:literal)*
+                    $(/  $div_li:literal)*
+                    $(*  $mul_li:literal)*
+                    $(<< $shl_li:literal)*
+                    $(>> $shr_li:literal)*
                 
-                $(|  $bitor_id:ident)*
-                $(+  $add_id:ident)*
-                $(&  $bitand_id:ident)*
-                $(^  $bitxor_id:ident )*
-                $(/  $div_id:ident    )*
-                $(*  $mul_id:ident    )*
-                $(<< $shl_id:ident    )*
-                $(>> $shr_id:ident    )*
+                    $(|  $bitor_id:ident)*
+                    $(+  $add_id:ident)*
+                    $(&  $bitand_id:ident)*
+                    $(^  $bitxor_id:ident )*
+                    $(/  $div_id:ident    )*
+                    $(*  $mul_id:ident    )*
+                    $(<< $shl_id:ident    )*
+                    $(>> $shr_id:ident    )*
 
-                $(|  (enum $bitor_type_sid:path)  $bitor_sid:ident  )*
-                $(+  (enum $add_type_sid:path)    $add_sid:ident    )*
-                $(&  (enum $bitand_type_sid:path) $bitand_sid:ident )*
-                $(^  (enum $bitxor_type_sid:path) $bitxor_sid:ident )*
-                $(/  (enum $div_type_sid:path)    $div_sid:ident    )*
-                $(*  (enum $mul_type_sid:path)    $mul_sid:ident    )*
-                $(<< (enum $shl_type_sid:path)    $shl_sid:ident    )*
-                $(>> (enum $shr_type_sid:path)    $shr_sid:ident    )*
+                    $(|  (enum $bitor_type_sid:ty)  $bitor_sid:ident  )*
+                    $(+  (enum $add_type_sid:ty)    $add_sid:ident    )*
+                    $(&  (enum $bitand_type_sid:ty) $bitand_sid:ident )*
+                    $(^  (enum $bitxor_type_sid:ty) $bitxor_sid:ident )*
+                    $(/  (enum $div_type_sid:ty)    $div_sid:ident    )*
+                    $(*  (enum $mul_type_sid:ty)    $mul_sid:ident    )*
+                    $(<< (enum $shl_type_sid:ty)    $shl_sid:ident    )*
+                    $(>> (enum $shr_type_sid:ty)    $shr_sid:ident    )*
                 ,$(#[$comment:meta])*
             )+
         }
@@ -430,24 +438,29 @@ macro_rules! encap_enum {
         $(
             $(#[$outer_comment])?
             #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
-            $outer_vis struct $name(isize);
+            $outer_vis struct $name{
+                raw: isize            
+            }
             __encap_enum_impl!{$name, isize}
             impl $name {
-                #[allow(dead_code)]
+                const fn new(data: isize) -> Self{
+                    Self{raw: data}
+                }
+                
                 pub fn iter() -> core::slice::Iter<'static, isize> {
 
-                    const _ARRAY: &[isize] = &[$($name :: $val_name .0,)+];
+                    const _ARRAY: &[isize] = &[$($name :: $val_name .raw,)+];
                     _ARRAY.into_iter()
                 }
 
                 $(
                     $(#[$comment])*
                     #[allow(non_upper_case_globals)]
-                    pub const $val_name: $name = $name (
-                        $($li $(- $sub_li)* $(- $name :: $li_sub_id .0)* $(- $type0 ($li_sub_sid) .0 )*)?
-                        $($name :: $id .0 $(- $name :: $sub_id .0)* $(- $id_sub_li)* $(- $type1 ($id_sub_sid) .0 )*)?
-                        $($type2 ($($sid0)? $(- $sid1)*) .0 $(- $($sid_sub_li)* )*)*                    
-                        $(- $name :: $id1 .0)?
+                    pub const $val_name: $name = $name { raw :
+                        $($li $(- $sub_li)* $(- $name :: $li_sub_id .raw)* $(- $type0 ($li_sub_sid) .raw )*)?
+                        $($name :: $id .raw $(- $name :: $sub_id .raw)* $(- $id_sub_li)* $(- $type1 ($id_sub_sid) .raw )*)?
+                        $($type2 ($($sid0)? $(- $sid1)*) .raw $(- $($sid_sub_li)* )*)*                    
+                        $(- $name :: $id1 .raw)?
 
                         $(|  $bitor_li  )*
                         $(+  $add_li    )*
@@ -458,24 +471,24 @@ macro_rules! encap_enum {
                         $(<< $shl_li    )*
                         $(>> $shr_li    )*
 
-                        $(|  $name :: $bitor_id .0  )*
-                        $(+  $name :: $add_id .0    )*
-                        $(&  $name :: $bitand_id .0 )*
-                        $(^  $name :: $bitxor_id .0 )*
-                        $(/  $name :: $div_id .0    )*
-                        $(*  $name :: $mul_id .0    )*
-                        $(<< $name :: $shl_id .0    )*
-                        $(>> $name :: $shr_id .0    )*
+                        $(|  $name :: $bitor_id .raw  )*
+                        $(+  $name :: $add_id .raw    )*
+                        $(&  $name :: $bitand_id .raw )*
+                        $(^  $name :: $bitxor_id .raw )*
+                        $(/  $name :: $div_id .raw    )*
+                        $(*  $name :: $mul_id .raw    )*
+                        $(<< $name :: $shl_id .raw    )*
+                        $(>> $name :: $shr_id .raw    )*
 
-                        $(|  $bitor_type_sid ($bitor_sid)   .0 )*
-                        $(+  $add_type_sid ($add_sid)       .0 )*
-                        $(&  $bitand_type_sid ($bitand_sid) .0 )*
-                        $(^  $bitxor_type_sid($bitxor_sid)  .0 )*
-                        $(/  $div_type_sid ($div_sid)       .0 )*
-                        $(*  $mul_type_sid ($mul_sid)       .0 )*
-                        $(<< $shl_type_sid ($shl_sid)       .0 )*
-                        $(>> $shr_type_sid ($shr_sid)       .0 )*
-                    );
+                        $(|  <$bitor_type_sid>  :: new($bitor_sid)  .raw )*
+                        $(+  <$add_type_sid>    :: new($add_sid)    .raw )*
+                        $(&  <$bitand_type_sid> :: new($bitand_sid) .raw )*
+                        $(^  <$bitxor_type_sid> :: new($bitxor_sid) .raw )*
+                        $(/  <$div_type_sid>    :: new($div_sid)    .raw )*
+                        $(*  <$mul_type_sid>    :: new($mul_sid)    .raw )*
+                        $(<< <$shl_type_sid>    :: new($shl_sid)    .raw )*
+                        $(>> <$shr_type_sid>    :: new($shr_sid)    .raw )*
+                    };
                 )+
             }
         )+
@@ -507,12 +520,14 @@ macro_rules! encap_enum {
             $(
                 $(#[$outer_comment])*
                 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
-                $outer_vis struct $name(isize);
+                $outer_vis struct $name{
+                    raw: isize            
+                }
                 __encap_enum_impl!{$name, isize}            
                 
                 impl $name {                    
                     pub fn iter() -> core::slice::Iter<'static, isize> {
-                        const _ARRAY: &[isize] = &[$($name :: $val_name .0,)+];
+                        const _ARRAY: &[isize] = &[$($name :: $val_name .raw,)+];
                         _ARRAY.into_iter()
                     }    
 
@@ -520,7 +535,7 @@ macro_rules! encap_enum {
                     $(
                         $(#[$comment])*
                         #[allow(non_upper_case_globals)]
-                        pub const $val_name: $name = $name ( __encap_enum :: $name:: $namespace :: $val_name as isize);
+                        pub const $val_name: $name = $name { raw : __encap_enum :: $name:: $namespace :: $val_name as isize};
                     )+
                 }
             )+
@@ -553,25 +568,31 @@ macro_rules! encap_enum {
             $(
                 $(#[$outer_comment])*
                 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Hash)]
-                $outer_vis struct $name($inner_vis $type);
-                __encap_enum_impl!{$name, $type}            
+                $outer_vis struct $name{
+                    $inner_vis raw: $type            
+                }
+                __encap_enum_impl!{$name, $type}
                 
                 impl $name {
 
+                    $inner_vis const fn new(data: $type) -> Self{
+                        Self{raw: data}
+                    }
+
                     pub fn iter() -> core::slice::Iter<'static, $type> {
-                        const _ARRAY: &[$type] = &[$($name :: $val_name .0,)+];
+                        const _ARRAY: &[$type] = &[$($name :: $val_name .raw,)+];
                         _ARRAY.into_iter()
                     }
                     
                     $inner_vis fn get_bit(&self, bit:u8) -> bool{
 
-                        self.0 & (1 << bit) != 0
+                        self.raw & (1 << bit) != 0
                     }
 
                     $(
                         $(#[$comment])*
                         #[allow(non_upper_case_globals)]
-                        pub const $val_name: $name = $name ( __encap_enum :: $name:: $namespace :: $val_name as $type);
+                        pub const $val_name: $name = $name { raw : __encap_enum :: $name:: $namespace :: $val_name as $type};
                     )+
                 }
             )+
@@ -675,14 +696,14 @@ mod tests {
 
     // Verify the relationship between enum values and raw values.
     #[test]
-    fn value_integrity() {
+    fn value_integrity() {        
         let var0 = flag::TestEnum::Array;
         let var1 = flag::TestEnum::Bar | flag::TestEnum::Jar;
-        assert_eq!(-OtherEnum::Bar.0, -1); // Replacing OtherEnum with SpecificEnum results in an unsigned error, which is expected
-        assert_eq!(var0.0, 0);
-        assert_eq!(var1.0, 3);
+        assert_eq!(-OtherEnum::Bar.raw, -1); // Replacing OtherEnum with SpecificEnum results in an unsigned error, which is expected
+        assert_eq!(var0.raw, 0);
+        assert_eq!(var1.raw, 3);
         assert_eq!(SignedEnum::Bard, 6.into());
-        assert_eq!(SignedEnum::Yard.0, TEST_CONST - TEST_CONST_TWO);
+        assert_eq!(SignedEnum::Yard.raw, TEST_CONST - TEST_CONST_TWO);
         assert_eq!(SignedEnum::Bard.get_bit(1), true);
     }
 
@@ -705,7 +726,7 @@ mod tests {
             }  
             }
         }
-        assert_ne!(tmp::GreaterEnum::Bar.0 as isize, flag::TestEnum::Bar.0);
+        assert_ne!(tmp::GreaterEnum::Bar.raw as isize, flag::TestEnum::Bar.raw);
 
         let mut count = 0isize;
         for t in flag::TestEnum::iter() {
@@ -808,6 +829,6 @@ mod tests {
                 Aqua = (enum ExternEnum)AQUA + (enum ExternEnum)TERA,
             }  
         }        
-        assert_eq!(ExternEnum::Aqua.0, AQUA + TERA);
+        assert_eq!(ExternEnum::Aqua.raw, AQUA + TERA);
     }
 }
